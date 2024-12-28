@@ -37,27 +37,27 @@ pyyaml-include = "^2.1"
 
 [tool.poetry.dependencies.sck-core-component]
 path = "../sck-core-component"
-depend = true
+develop = true
 
 [tool.poetry.dependencies.sck-core-deployspec]
 path = "../sck-core-deployspec"
-depend = true
+develop = true
 
 [tool.poetry.dependencies.sck-core-execute]
 path = "../sck-core-execute"
-depend = true
+develop = true
 
 [tool.poetry.dependencies.sck-core-runner]
 path = "../sck-core-runner"
-depend = true
+develop = true
 
 [tool.poetry.dependencies.sck-core-db]
 path = "../sck-core-db"
-depend = true
+develop = true
 
 [tool.poetry.dependencies.sck-core-framework]
 path = "../sck-core-framework"
-depend = true
+develop = true
 [tool.poetry-dynamic-versioning.files."core_invoker/_version.py"]
 persistent-substitution = true
 initial-content = "  \"\"\"\n  This is the version informatooin for this template\n  \"\"\"\n  __version__ = \"0.0.0\"\n  __version_tuple__ = (0, 0, 0)\n"
