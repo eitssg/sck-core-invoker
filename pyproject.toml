@@ -4,7 +4,7 @@ build-backend = "poetry_dynamic_versioning.backend"
 
 [tool.poetry]
 name = "sck-core-invoker"
-version = "0.0.1"
+version = "0.0.2"
 description = "Core Automation Invoker Lambda function"
 authors = [ "James Barwick <jbarwick@me.com>",]
 license = "GPL-3.0-only"
@@ -34,14 +34,12 @@ python-dotenv = "^1.0.1"
 PyYAML = "^6.0.2"
 pyyaml-include = "^2.1"
 
-sck-core-framework = "^0.0.1"
-sck-core-db = "^0.0.1"
-sck-core-runner = "^0.0.1"
-sck-core-deployspec = "^0.0.1"
-sck-core-component = "^0.0.1"
-[tool.poetry.dependencies.sck-core-execute]
-path = "../sck-core-execute"
-develop = true
+sck-core-framework = "^0.0.2"
+sck-core-db = "^0.0.2"
+sck-core-runner = "^0.0.2"
+sck-core-deployspec = "^0.0.2"
+sck-core-component = "^0.0.2"
+sck-core-execute = "^0.0.1"
 
 [tool.poetry-dynamic-versioning.files."core_invoker/_version.py"]
 persistent-substitution = true

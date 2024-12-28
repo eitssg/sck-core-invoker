@@ -5,8 +5,8 @@ from core_framework.constants import V_LOCAL, TR_RESPONSE, OBJ_ARTEFACTS, V_SERV
 
 import core_helper.aws as aws
 
-from core_component_compiler.handler import handler as component_compiler_handler
-from core_deployspec_compiler.handler import handler as deployspec_compiler_handler
+from core_component.handler import handler as component_compiler_handler
+from core_deployspec.handler import handler as deployspec_compiler_handler
 from core_runner.handler import handler as runner_handler
 
 from core_framework.models import TaskPayload
