@@ -55,7 +55,9 @@ def execute_deployspec_compiler(task_payload: TaskPayload) -> dict:
     result = aws.invoke_lambda(arn, task_payload.model_dump())
     if TR_RESPONSE not in result:
         raise RuntimeError(
-            "Deployspec compiler response does not contain a response: {}".format(result)
+            "Deployspec compiler response does not contain a response: {}".format(
+                result
+            )
         )
     return result[TR_RESPONSE]
 

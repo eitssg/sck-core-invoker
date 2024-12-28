@@ -58,12 +58,7 @@ def handler(event: dict, context: Any | None = None) -> dict:
 
             return compiler_response
 
-        if task_payload.Task in [
-            TASK_DEPLOY,
-            TASK_APPLY,
-            TASK_RELEASE,
-            TASK_TEARDOWN
-        ]:
+        if task_payload.Task in [TASK_DEPLOY, TASK_APPLY, TASK_RELEASE, TASK_TEARDOWN]:
 
             return execute_runner(task_payload)
 
