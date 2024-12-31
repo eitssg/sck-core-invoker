@@ -30,6 +30,8 @@ def handler(event: dict, context: Any | None = None) -> dict:
         # Setup logging
         log.setup(task_payload.Identity)
 
+        log.info("Invoker started. Executing task: {}", task_payload.Task)
+
         if task_payload.Task == TASK_COMPILE_PIPELINE:
 
             # Copy package to artefacts bucket / key

@@ -1,3 +1,4 @@
+from typing import OrderedDict
 import core_logging as log
 
 import core_framework as util
@@ -10,7 +11,7 @@ from core_deployspec.handler import handler as deployspec_compiler_handler
 from core_runner.handler import handler as runner_handler
 
 from core_framework.models import TaskPayload
-from core_framework.magic import MagicBucket
+from core_framework.magic import MagicS3Client
 
 
 def execute_pipeline_compiler(task_payload: TaskPayload) -> dict:
@@ -24,6 +25,7 @@ def execute_pipeline_compiler(task_payload: TaskPayload) -> dict:
     Returns:
         dict: the results of the component compiler
     """
+    log.info("Invoking pipeline compiler")
 
     if util.is_local_mode():
         return component_compiler_handler(task_payload.model_dump(), None)
@@ -115,12 +117,14 @@ def copy_to_artefacts(task_payload: TaskPayload) -> dict:
     if not package.Key:
         raise ValueError("Package key not found in task payload")
 
-    object_name = package.Key.rsplit("/", 1)[-1]
+    object_name = package.get_name()
 
     dd = task_payload.DeploymentDetails
     destination_key = dd.get_object_key(
         OBJ_ARTEFACTS, object_name, s3=package.Mode == V_SERVICE
     )
+
+    copy_source = {"Bucket": package.BucketName, "Key": package.Key, "VersionId": None}
 
     destination = {
         "Bucket": artefact_bucket_name,
@@ -130,11 +134,12 @@ def copy_to_artefacts(task_payload: TaskPayload) -> dict:
 
     log.info(
         "Copying object to artefacts",
-        details={"Source": package, "Destination": destination},
+        details=OrderedDict([("Source", copy_source), ("Destination", destination)]),
     )
 
     if package.Mode == V_LOCAL:
-        artefact_bucket = MagicBucket(artefact_bucket_name, artefact_bucket_region)
+        local = MagicS3Client(Region=artefact_bucket_region, AppPath=package.AppPath)
+        artefact_bucket = local.Bucket(artefact_bucket_name)
     else:
         s3 = aws.s3_resource(artefact_bucket_region)
         artefact_bucket = s3.Bucket(artefact_bucket_name)
@@ -142,13 +147,15 @@ def copy_to_artefacts(task_payload: TaskPayload) -> dict:
     destination_object = artefact_bucket.Object(destination_key)
 
     # Copy the object
-    copy_source = {"Bucket": package.BucketName, "Key": package.Key, "VersionId": None}
-
     response = destination_object.copy_from(
         ACL="bucket-owner-full-control",
         CopySource=copy_source,
         ServerSideEncryption="AES256",
     )
 
-    # Return details of the new object
+    if "Error" in response:
+        raise Exception(
+            "Error copying object to artefacts: {}".format(response["Error"])
+        )
+
     return response
