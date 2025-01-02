@@ -300,7 +300,7 @@ def task_payload(bootstrap_dynamo, portfolio_data: PortfolioFacts, app_data: App
     pkg = task_payload.Package
 
     # UPLOAD action to upload our package to the system
-    zipfilename = os.path.join(pkg.AppPath, pkg.BucketName, pkg.Key)
+    zipfilename = os.path.join(pkg.DataPath, pkg.BucketName, pkg.Key)
     os.makedirs(os.path.dirname(zipfilename), exist_ok=True)
 
     if os.path.exists(zipfilename):

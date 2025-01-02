@@ -2,7 +2,7 @@ from typing import OrderedDict
 import core_logging as log
 
 import core_framework as util
-from core_framework.constants import V_LOCAL, TR_RESPONSE, OBJ_ARTEFACTS, V_SERVICE
+from core_framework.constants import TR_RESPONSE, OBJ_ARTEFACTS, V_SERVICE
 
 import core_helper.aws as aws
 
@@ -11,7 +11,7 @@ from core_deployspec.handler import handler as deployspec_compiler_handler
 from core_runner.handler import handler as runner_handler
 
 from core_framework.models import TaskPayload
-from core_framework.magic import MagicS3Client
+from core_helper.magic import MagicS3Client
 
 
 def execute_pipeline_compiler(task_payload: TaskPayload) -> dict:
@@ -27,16 +27,19 @@ def execute_pipeline_compiler(task_payload: TaskPayload) -> dict:
     """
     log.info("Invoking pipeline compiler")
 
-    if util.is_local_mode():
-        return component_compiler_handler(task_payload.model_dump(), None)
-
     arn = util.get_component_compiler_lambda_arn()
-    result = aws.invoke_lambda(arn, task_payload.model_dump())
-    if TR_RESPONSE not in result:
+
+    if util.is_local_mode():
+        response = component_compiler_handler(task_payload.model_dump(), None)
+    else:
+        response = aws.invoke_lambda(arn, task_payload.model_dump())
+
+    if TR_RESPONSE not in response:
         raise RuntimeError(
-            "Pipeline compiler response does not contain a response: {}".format(result)
+            "Pipeline compiler response does not contain a response: {}".format(response)
         )
-    return result[TR_RESPONSE]
+
+    return response[TR_RESPONSE]
 
 
 def execute_deployspec_compiler(task_payload: TaskPayload) -> dict:
@@ -49,19 +52,23 @@ def execute_deployspec_compiler(task_payload: TaskPayload) -> dict:
     Returns:
         dict: the results of the deployspec compile
     """
-
-    if util.is_local_mode():
-        return deployspec_compiler_handler(task_payload.model_dump(), None)
+    log.info("Invoking deployspec compiler")
 
     arn = util.get_deployspec_compiler_lambda_arn()
-    result = aws.invoke_lambda(arn, task_payload.model_dump())
-    if TR_RESPONSE not in result:
+
+    if util.is_local_mode():
+        response = deployspec_compiler_handler(task_payload.model_dump(), None)
+    else:
+        response = aws.invoke_lambda(arn, task_payload.model_dump())
+
+    if TR_RESPONSE not in response:
         raise RuntimeError(
             "Deployspec compiler response does not contain a response: {}".format(
-                result
+                response
             )
         )
-    return result[TR_RESPONSE]
+
+    return response[TR_RESPONSE]
 
 
 def execute_runner(task_payload: TaskPayload) -> dict:
@@ -71,23 +78,29 @@ def execute_runner(task_payload: TaskPayload) -> dict:
     It is assumed that task_payload is fully populated with the
     location of the files for Package, Action, and State artefacts.
 
+    The "Task Response" is a dictionary { "Response": "..." }
+
     Args:
         task_payload (TaskPayload): the task definition.
 
     Returns:
-        dict: results of the runner start request
+        dict: Tasc Response results of the runner start request
     """
-
-    if util.is_local_mode():
-        return runner_handler(task_payload.model_dump(), None)
+    log.info("Invoking runner")
 
     arn = util.get_start_runner_lambda_arn()
-    response = aws.invoke_lambda(arn, task_payload.model_dump())
+
+    if util.is_local_mode():
+        response = runner_handler(task_payload.model_dump(), None)
+    else:
+        response = aws.invoke_lambda(arn, task_payload.model_dump())
+
     if TR_RESPONSE not in response:
         raise RuntimeError(
             "Runner response does not contain a response: {}".format(response)
         )
-    return response[TR_RESPONSE]
+
+    return response
 
 
 def copy_to_artefacts(task_payload: TaskPayload) -> dict:
@@ -137,12 +150,9 @@ def copy_to_artefacts(task_payload: TaskPayload) -> dict:
         details=OrderedDict([("Source", copy_source), ("Destination", destination)]),
     )
 
-    if package.Mode == V_LOCAL:
-        local = MagicS3Client(Region=artefact_bucket_region, AppPath=package.AppPath)
-        artefact_bucket = local.Bucket(artefact_bucket_name)
-    else:
-        s3 = aws.s3_resource(artefact_bucket_region)
-        artefact_bucket = s3.Bucket(artefact_bucket_name)
+    artefact_bucket = MagicS3Client.get_bucket(
+        Region=artefact_bucket_region, BucketName=artefact_bucket_name
+    )
 
     destination_object = artefact_bucket.Object(destination_key)
 
