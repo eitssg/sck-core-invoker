@@ -1,6 +1,5 @@
 import pytest
 import os
-import re
 import core_framework as util
 
 import core_helper.aws as aws
@@ -31,18 +30,40 @@ from core_db.facter import get_facts
 from core_invoker.handler import handler as invoker
 
 from core_framework.constants import (
-    TASK_COMPILE_DEPLOYSPEC,
-    TASK_COMPILE_PIPELINE,
     TASK_DEPLOY,
     TASK_APPLY,
     TASK_RELEASE,
     TASK_TEARDOWN,
     TASK_PLAN,
+    TASK_COMPILE,
+    V_PIPELINE,
+    V_DEPLOYSPEC,
 )
 
 
 @pytest.fixture(scope="module")
-def bootstrap_dynamo():
+def arguments() -> dict:
+
+    client = util.get_client()
+    portfolio = "my-portfolio"
+    app = "my-app"
+    branch = "my-branch"
+    build = "dp-build"
+
+    args = {
+        "task": "compile",
+        "client": client,
+        "portfolio": portfolio,
+        "app": app,
+        "branch": branch,
+        "build": build,
+    }
+
+    return args
+
+
+@pytest.fixture(scope="module")
+def bootstrap_dynamo() -> bool:
 
     # see environment variables in .env
     host = util.get_dynamodb_host()
@@ -81,7 +102,7 @@ def bootstrap_dynamo():
 
 
 @pytest.fixture(scope="module")
-def organization(**kwargs) -> dict:
+def organization() -> dict:
     """Return organization information for the AWS Profile"""
     organization = {"id": "", "account_id": "", "name": "", "email": ""}
     try:
@@ -107,9 +128,16 @@ def organization(**kwargs) -> dict:
 
 
 @pytest.fixture(scope="module")
-def client_data(bootstrap_dynamo, organization: dict) -> ClientFacts:
+def client_data(
+    bootstrap_dynamo: bool, organization: dict, arguments: dict
+) -> ClientFacts:
 
-    client = util.get_client()
+    assert bootstrap_dynamo
+    assert isinstance(organization, dict)
+    assert isinstance(arguments, dict)
+
+    client = arguments["client"]
+
     region = util.get_region()
     bucket_name = util.get_bucket_name()
 
@@ -139,9 +167,16 @@ def client_data(bootstrap_dynamo, organization: dict) -> ClientFacts:
 
 
 @pytest.fixture(scope="module")
-def portfolio_data(bootstrap_dynamo, client_data: ClientFacts) -> PortfolioFacts:
+def portfolio_data(
+    bootstrap_dynamo: bool, client_data: ClientFacts, arguments: dict
+) -> PortfolioFacts:
 
-    portfllio_name = "my-portfolio"
+    assert bootstrap_dynamo
+    assert isinstance(client_data, ClientFacts)
+    assert isinstance(arguments, dict)
+
+    portfllio_name = arguments["portfolio"]
+
     domain_name = client_data.Domain
 
     portfolio = PortfolioFacts(
@@ -176,13 +211,19 @@ def portfolio_data(bootstrap_dynamo, client_data: ClientFacts) -> PortfolioFacts
 
 
 @pytest.fixture(scope="module")
-def zone_data(bootstrap_dynamo, client_data: ClientFacts) -> ZoneFacts:
+def zone_data(bootstrap_dynamo: bool, client_data: ClientFacts) -> ZoneFacts:
+
+    assert bootstrap_dynamo
+    assert isinstance(client_data, ClientFacts)
 
     automation_account_id = client_data.AutomationAccount
     automation_account_name = client_data.OrganizationName
+
+    zone_label = "my-automation-service-zone"
+
     zone = ZoneFacts(
         Client=client_data.Client,
-        Zone="my-automation-service-zone",
+        Zone=zone_label,
         AccountFacts=AccountFactsModel(
             Client=client_data.Client,
             AwsAccountId=automation_account_id,
@@ -246,7 +287,7 @@ def zone_data(bootstrap_dynamo, client_data: ClientFacts) -> ZoneFacts:
                 Tags={"Region": "sin"},
             )
         },
-        Tags={"Zone": "my-automation-service-zone"},
+        Tags={"Zone": zone_label},
     )
     zone.save()
 
@@ -255,15 +296,26 @@ def zone_data(bootstrap_dynamo, client_data: ClientFacts) -> ZoneFacts:
 
 @pytest.fixture(scope="module")
 def app_data(
-    bootstrap_dynamo, portfolio_data: PortfolioFacts, zone_data: ZoneFacts
+    bootstrap_dynamo: bool,
+    portfolio_data: PortfolioFacts,
+    zone_data: ZoneFacts,
+    arguments: dict,
 ) -> AppFacts:
+
+    assert bootstrap_dynamo
+    assert isinstance(portfolio_data, PortfolioFacts)
+    assert isinstance(zone_data, ZoneFacts)
+    assert isinstance(arguments, dict)
+
+    portfolio = arguments["portfolio"]
+    app = arguments["app"]
 
     # The client/portfolio is where this BizApp that this Deployment is for.
     # The Zone is where this BizApp component will be deployed.
 
     app = AppFacts(
         ClientPortfolio=portfolio_data.get_client_portfolio_key(),
-        AppRegex="^prn:my-portfolio:my-app:.*:.*$",
+        AppRegex=f"^prn:{portfolio}:{app}:.*:.*$",
         Zone=zone_data.Zone,
         Name="test application",
         Environment="prod",
@@ -280,22 +332,9 @@ def app_data(
 
 
 @pytest.fixture(scope="module")
-def task_payload(bootstrap_dynamo, portfolio_data: PortfolioFacts, app_data: AppFacts) -> TaskPayload:
-
-    app_search_regex = app_data.AppRegex
-
-    arguments: dict = {
-        "portfolio": portfolio_data.Portfolio,
-        "app": "my-app",
-        "branch": "dev-branch",
-        "build": "build-1",
-    }
+def task_payload(arguments: dict) -> TaskPayload:
 
     task_payload = TaskPayload.from_arguments(**arguments)
-
-    identity = task_payload.Identity
-
-    assert re.match(app_search_regex, identity)
 
     pkg = task_payload.Package
 
@@ -315,13 +354,20 @@ def task_payload(bootstrap_dynamo, portfolio_data: PortfolioFacts, app_data: App
 
 @pytest.fixture(scope="module")
 def facts_data(
-    bootstrap_dynamo,
+    bootstrap_dynamo: bool,
     task_payload: TaskPayload,
     client_data: ClientFacts,
     portfolio_data: PortfolioFacts,
     zone_data: ZoneFacts,
     app_data: AppFacts,
 ):
+
+    assert bootstrap_dynamo
+    assert isinstance(task_payload, TaskPayload)
+    assert isinstance(client_data, ClientFacts)
+    assert isinstance(portfolio_data, PortfolioFacts)
+    assert isinstance(zone_data, ZoneFacts)
+    assert isinstance(app_data, AppFacts)
 
     deployment_details = task_payload.DeploymentDetails
 
@@ -338,26 +384,14 @@ def facts_data(
     return facts
 
 
-def test_compile_pipeline(task_payload: TaskPayload, facts_data: dict):
+def test_run_ds_compile(task_payload: TaskPayload, facts_data: dict):
 
     assert facts_data is not None
 
-    task_payload.Task = TASK_COMPILE_PIPELINE
+    task_payload.Task = TASK_COMPILE
+    task_payload.Type = V_DEPLOYSPEC
 
-    event = task_payload.model_dump()
-    response = invoker(event, None)
-
-    assert response is not None
-    assert "Error" in response
-    assert response["Error"] == "Not implemented"
-
-
-def test_compile_deployspec(task_payload: TaskPayload):
-
-    task_payload.Task = TASK_COMPILE_DEPLOYSPEC
-
-    event = task_payload.model_dump()
-    response = invoker(event, None)
+    response = invoker(task_payload.model_dump(), None)
 
     assert response is not None
 
@@ -366,60 +400,102 @@ def test_compile_deployspec(task_payload: TaskPayload):
     assert response["Error"] == "Not implemented"
 
 
-def test_run_plan(task_payload: TaskPayload):
+def test_run_ds_plan(task_payload: TaskPayload, facts_data: dict):
+
+    assert facts_data is not None
 
     task_payload.Task = TASK_PLAN
+    task_payload.Type = V_DEPLOYSPEC
 
-    event = task_payload.model_dump()
-    response = invoker(event, None)
+    response = invoker(task_payload.model_dump(), None)
 
     assert response is not None
     assert "Error" in response
     assert response["Error"] == "Not implemented"
 
 
-def test_run_appy(task_payload: TaskPayload):
+def test_run_ds_apply(task_payload: TaskPayload, facts_data: dict):
+
+    assert facts_data is not None
 
     task_payload.Task = TASK_APPLY
+    task_payload.Type = V_DEPLOYSPEC
 
-    event = task_payload.model_dump()
-    response = invoker(event, None)
+    response = invoker(task_payload.model_dump(), None)
 
     assert response is not None
     assert "Error" in response
     assert response["Error"] == "Not implemented"
 
 
-def test_run_deploy(task_payload: TaskPayload):
+def test_run_ds_deploy(task_payload: TaskPayload):
 
     task_payload.Task = TASK_DEPLOY
+    task_payload.Type = V_DEPLOYSPEC
 
-    event = task_payload.model_dump()
-    response = invoker(event, None)
-
-    assert response is not None
-    assert "Error" in response
-    assert response["Error"] == "Not implemented"
-
-
-def test_run_release(task_payload: TaskPayload):
-
-    task_payload.Task = TASK_RELEASE
-
-    event = task_payload.model_dump()
-    response = invoker(event, None)
+    response = invoker(task_payload.model_dump(), None)
 
     assert response is not None
     assert "Error" in response
     assert response["Error"] == "Not implemented"
 
 
-def test_run_teardown(task_payload: TaskPayload):
+def test_run_ds_teardown(task_payload: TaskPayload):
 
     task_payload.Task = TASK_TEARDOWN
+    task_payload.Type = V_DEPLOYSPEC
 
-    event = task_payload.model_dump()
-    response = invoker(event, None)
+    response = invoker(task_payload.model_dump(), None)
+
+    assert response is not None
+    assert "Error" in response
+    assert response["Error"] == "Not implemented"
+
+
+def test_run_pl_compile(task_payload: TaskPayload, facts_data: dict):
+
+    assert facts_data is not None
+
+    task_payload.Task = TASK_COMPILE
+    task_payload.Type = V_PIPELINE
+
+    response = invoker(task_payload.model_dump(), None)
+
+    assert response is not None
+    assert "Error" in response
+    assert response["Error"] == "Not implemented"
+
+
+def test_run_pl_deploy(task_payload: TaskPayload):
+
+    task_payload.Task = TASK_DEPLOY
+    task_payload.Type = V_PIPELINE
+
+    response = invoker(task_payload.model_dump(), None)
+
+    assert response is not None
+    assert "Error" in response
+    assert response["Error"] == "Not implemented"
+
+
+def test_run_pl_release(task_payload: TaskPayload):
+
+    task_payload.Task = TASK_RELEASE
+    task_payload.Type = V_PIPELINE
+
+    response = invoker(task_payload.model_dump(), None)
+
+    assert response is not None
+    assert "Error" in response
+    assert response["Error"] == "Not implemented"
+
+
+def test_run_pl_teardown(task_payload: TaskPayload):
+
+    task_payload.Task = TASK_TEARDOWN
+    task_payload.Type = V_PIPELINE
+
+    response = invoker(task_payload.model_dump(), None)
 
     assert response is not None
     assert "Error" in response

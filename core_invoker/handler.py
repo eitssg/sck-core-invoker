@@ -7,8 +7,9 @@ from core_framework.constants import (
     TASK_TEARDOWN,
     TASK_PLAN,
     TASK_APPLY,
-    TASK_COMPILE_PIPELINE,
-    TASK_COMPILE_DEPLOYSPEC,
+    TASK_COMPILE,
+    V_PIPELINE,
+    V_DEPLOYSPEC,
 )
 
 from .invoker import (
@@ -46,46 +47,92 @@ def handler(event: dict, context: Any | None = None) -> dict:
         # Setup logging
         log.setup(task_payload.Identity)
 
-        log.info("Invoker started. Executing task: {}", task_payload.Task)
+        log.info(
+            "Invoker started. Executing task: {}-{}",
+            task_payload.Task,
+            task_payload.Type,
+        )
 
-        if task_payload.Task == TASK_COMPILE_PIPELINE:
+        if task_payload.Type == V_PIPELINE:
 
-            # Copy package to artefacts bucket / key
-            copy_to_artefacts(task_payload)
+            return handle_pipeline(task_payload)
 
-            # Compile the package
-            compiler_response = execute_pipeline_compiler(task_payload)
+        if task_payload.Type == V_DEPLOYSPEC:
 
-            # MUST return a dictionary { "Response": "..." }
-            return compiler_response
+            return handle_deployspec(task_payload)
 
-        if task_payload.Task == TASK_COMPILE_DEPLOYSPEC:
-
-            # Copy package to artefacts bucket / key
-            copy_to_artefacts(task_payload)
-
-            # Compile the package
-            compiler_response = execute_deployspec_compiler(task_payload)
-
-            # MUST return a dictionary { "Response": "..." }
-            return compiler_response
-
-        if task_payload.Task == TASK_PLAN:
-
-            copy_to_artefacts(task_payload)
-
-            compiler_response = {"Error": "Not implemented"}
-
-            # MUST return a dictionary { "Response": "..." }
-            return compiler_response
-
-        if task_payload.Task in [TASK_DEPLOY, TASK_APPLY, TASK_RELEASE, TASK_TEARDOWN]:
-
-            # MUST return a dictionary { "Response": "..." }
-            return execute_runner(task_payload)
-
-        raise ValueError("Unsupported task '{}'".format(task_payload.Task))
+        raise ValueError("Unsupported task type '{}'".format(task_payload.Type))
 
     except Exception as e:
         log.error("Error executing task: {}", e)
         raise
+
+
+def handle_deployspec(task_payload: TaskPayload) -> dict:
+    """
+    Handle the deployment of a deploy spec.
+
+    Args:
+        task_payload (TaskPayload): The task payload object.
+
+    Returns:
+        dict: The response from the invoker.  This is usually a dictionary with a "Response" key.
+
+    """
+    if task_payload.Task == TASK_COMPILE:
+
+        # Compile the package
+        compiler_response = execute_deployspec_compiler(task_payload)
+
+        # MUST return a dictionary { "Response": "..." }
+        return compiler_response
+
+    if task_payload.Task == TASK_PLAN:
+
+        compiler_response = {"Error": "Not implemented"}
+
+        # MUST return a dictionary { "Response": "..." }
+        return compiler_response
+
+    if task_payload.Task == TASK_APPLY:
+
+        compiler_response = {"Error": "Not implemented"}
+
+        # MUST return a dictionary { "Response": "..." }
+        return compiler_response
+
+    if task_payload.Task in [TASK_DEPLOY, TASK_TEARDOWN]:
+
+        # MUST return a dictionary { "Response": "..." }
+        return execute_runner(task_payload)
+
+    raise ValueError("Unsupported task '{}'".format(task_payload.Task))
+
+
+def handle_pipeline(task_payload: TaskPayload) -> dict:
+    """
+    Handle the deployment of a pipeline.
+
+    Args:
+        task_payload (TaskPayload): The task payload object.
+
+    Returns:
+        dict: The response from the invoker.  This is usually a dictionary with a "Response" key.
+
+    """
+    if task_payload.Task == TASK_COMPILE:
+        # Copy package to artefacts bucket / key
+        copy_to_artefacts(task_payload)
+
+        # Compile the package
+        compiler_response = execute_pipeline_compiler(task_payload)
+
+        # MUST return a dictionary { "Response": "..." }
+        return compiler_response
+
+    if task_payload.Task in [TASK_DEPLOY, TASK_RELEASE, TASK_TEARDOWN]:
+
+        # MUST return a dictionary { "Response": "..." }
+        return execute_runner(task_payload)
+
+    raise ValueError("Unsupported task '{}'".format(task_payload.Task))
