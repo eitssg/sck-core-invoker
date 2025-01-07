@@ -36,7 +36,9 @@ def execute_pipeline_compiler(task_payload: TaskPayload) -> dict:
 
     if TR_RESPONSE not in response:
         raise RuntimeError(
-            "Pipeline compiler response does not contain a response: {}".format(response)
+            "Pipeline compiler response does not contain a response: {}".format(
+                response
+            )
         )
 
     return response[TR_RESPONSE]
