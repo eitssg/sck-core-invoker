@@ -1,3 +1,3 @@
-from .handler import handler
+from .handler import handler as invoke
 
-__all__ = ["handler"]
+__all__ = ["invoke"]
