@@ -10,7 +10,7 @@ authors = [ "James Barwick <jbarwick@me.com>",]
 license = "GPL-3.0-only"
 readme = "README.md"
 keywords = ["sck", "core", "aws", "cloud", "automation"]
-include = ["core_invoker/_version.py"]
+include = ["core_invoker/version.py"]
 
 [[tool.poetry.packages]]
 include = "core_invoker"
@@ -40,10 +40,8 @@ sck-core-execute = "^0.0.4"
 sck-core-deployspec = "^0.0.4"
 sck-core-component = "^0.0.4"
 
-
-[tool.poetry-dynamic-versioning.files."core_invoker/_version.py"]
-persistent-substitution = true
-initial-content = "  \"\"\"\n  This is the version informatooin for this template\n  \"\"\"\n  __version__ = \"0.0.0\"\n  __version_tuple__ = (0, 0, 0)\n"
+[tool.poetry-dynamic-versioning.substitution]
+files = ["core_invoker/__init__.py"]
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.3"
@@ -52,3 +50,4 @@ boto3-stubs = ">=1.35.93"
 cfn-lint = "^1.22.3"
 black = "^24.10.0"
 pytest-dotenv = "^0.5.2"
+pytest-codecov = "^0.6.1"
