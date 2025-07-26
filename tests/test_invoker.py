@@ -1,3 +1,10 @@
+"""
+Unit tests for the core invoker functionality.
+
+This module contains pytest test cases for the invoker handler,
+including setup of test data and validation of different task types.
+"""
+
 import pytest
 import os
 import core_framework as util
@@ -43,7 +50,12 @@ from core_framework.constants import (
 
 @pytest.fixture(scope="module")
 def arguments() -> dict:
+    """
+    Test arguments for task payload creation.
 
+    :returns: Dictionary containing test parameters
+    :rtype: dict
+    """
     client = util.get_client()
     portfolio = "my-portfolio"
     app = "my-app"
@@ -64,13 +76,17 @@ def arguments() -> dict:
 
 @pytest.fixture(scope="module")
 def bootstrap_dynamo() -> bool:
+    """
+    Bootstrap DynamoDB tables for testing.
 
+    :returns: True if bootstrap successful
+    :rtype: bool
+    :raises AssertionError: If DynamoDB setup fails
+    """
     # see environment variables in .env
     host = util.get_dynamodb_host()
 
-    assert (
-        host == "http://localhost:8000"
-    ), "DYNAMODB_HOST must be set to http://localhost:8000"
+    assert host == "http://localhost:8000", "DYNAMODB_HOST must be set to http://localhost:8000"
 
     try:
         if not EventModel.exists():
@@ -88,6 +104,7 @@ def bootstrap_dynamo() -> bool:
         if not AppFacts.exists():
             AppFacts.create_table(wait=True)
 
+        # Check if ZoneFacts exists before trying to delete
         if ZoneFacts.exists():
             ZoneFacts.delete_table()
 
@@ -95,15 +112,20 @@ def bootstrap_dynamo() -> bool:
             ZoneFacts.create_table(wait=True)
 
     except Exception as e:
-        print(e)
-        assert False
+        print(f"Error bootstrapping DynamoDB: {e}")
+        assert False, f"Failed to bootstrap DynamoDB: {e}"
 
     return True
 
 
 @pytest.fixture(scope="module")
 def organization() -> dict:
-    """Return organization information for the AWS Profile"""
+    """
+    Return organization information for the AWS Profile.
+
+    :returns: Dictionary containing organization details
+    :rtype: dict
+    """
     organization = {"id": "", "account_id": "", "name": "", "email": ""}
     try:
         client = aws.org_client()
@@ -128,10 +150,19 @@ def organization() -> dict:
 
 
 @pytest.fixture(scope="module")
-def client_data(
-    bootstrap_dynamo: bool, organization: dict, arguments: dict
-) -> ClientFacts:
+def client_data(bootstrap_dynamo: bool, organization: dict, arguments: dict) -> ClientFacts:
+    """
+    Create and save ClientFacts test data.
 
+    :param bootstrap_dynamo: Bootstrap completion status
+    :type bootstrap_dynamo: bool
+    :param organization: Organization information
+    :type organization: dict
+    :param arguments: Test arguments
+    :type arguments: dict
+    :returns: Created ClientFacts instance
+    :rtype: ClientFacts
+    """
     assert bootstrap_dynamo
     assert isinstance(organization, dict)
     assert isinstance(arguments, dict)
@@ -144,22 +175,22 @@ def client_data(
     aws_account_id = organization["account_id"]
 
     cf = ClientFacts(
-        client=client,
-        domain="my-domain.com",
-        organization_id=organization["id"],
-        organization_name=organization["name"],
-        organization_account=organization["account_id"],
-        organization_email=organization["email"],
-        client_region=region,
-        master_region=region,
-        automation_account=aws_account_id,
-        automation_bucket=bucket_name,
-        automation_bucket_region=region,
-        audit_account=aws_account_id,
-        docs_bucket=bucket_name,
-        security_account=aws_account_id,
-        ui_bucket=bucket_name,
-        scope_prefix="",
+        Client=client,  # PynamoDB: PascalCase attributes
+        Domain="my-domain.com",
+        OrganizationId=organization["id"],
+        OrganizationName=organization["name"],
+        OrganizationAccount=organization["account_id"],
+        OrganizationEmail=organization["email"],
+        ClientRegion=region,
+        MasterRegion=region,
+        AutomationAccount=aws_account_id,
+        BucketName=bucket_name,
+        BucketRegion=region,
+        AuditAccount=aws_account_id,
+        DocsBucketName=bucket_name,
+        SecurityAccount=aws_account_id,
+        UiBucket=bucket_name,
+        Scope="",
     )
     cf.save()
 
@@ -167,37 +198,39 @@ def client_data(
 
 
 @pytest.fixture(scope="module")
-def portfolio_data(
-    bootstrap_dynamo: bool, client_data: ClientFacts, arguments: dict
-) -> PortfolioFacts:
+def portfolio_data(bootstrap_dynamo: bool, client_data: ClientFacts, arguments: dict) -> PortfolioFacts:
+    """
+    Create and save PortfolioFacts test data.
 
+    :param bootstrap_dynamo: Bootstrap completion status
+    :type bootstrap_dynamo: bool
+    :param client_data: ClientFacts instance
+    :type client_data: ClientFacts
+    :param arguments: Test arguments
+    :type arguments: dict
+    :returns: Created PortfolioFacts instance
+    :rtype: PortfolioFacts
+    """
     assert bootstrap_dynamo
     assert isinstance(client_data, ClientFacts)
     assert isinstance(arguments, dict)
 
-    portfllio_name = arguments["portfolio"]
+    portfolio_name = arguments["portfolio"]
 
+    # PynamoDB: PascalCase attribute access
     domain_name = client_data.Domain
 
     portfolio = PortfolioFacts(
-        Client=client_data.Client,
-        Portfolio=portfllio_name,
-        Contacts=[ContactFacts(name="John Doe", email="john.doe@tmail.com")],
-        Approvers=[
-            ApproverFacts(
-                name="Jane Doe", email="john.doe@tmail.com", roles=["admin"], sequence=1
-            )
-        ],
-        Project=ProjectFacts(
-            name="my-project", description="my project description", code="MYPRJ"
-        ),
-        Bizapp=ProjectFacts(
-            name="my-bizapp", description="my bizapp description", code="MYBIZ"
-        ),
-        Owner=OwnerFacts(name="John Doe", email="john.doe@tmail.com"),
+        Client=client_data.Client,  # PynamoDB: PascalCase attributes
+        Portfolio=portfolio_name,
+        Contacts=[ContactFacts(Name="John Doe", Email="john.doe@example.com")],
+        Approvers=[ApproverFacts(Name="Jane Doe", Email="jane.doe@example.com", Roles=["admin"], Sequence=1)],
+        Project=ProjectFacts(Name="my-project", Description="my project description", Code="MYPRJ"),
+        Bizapp=ProjectFacts(Name="my-bizapp", Description="my bizapp description", Code="MYBIZ"),
+        Owner=OwnerFacts(Name="John Doe", Email="john.doe@example.com"),
         Domain=f"my-app.{domain_name}",
         Tags={
-            "BizzApp": "MyBizApp",
+            "BizApp": "MyBizApp",
             "Manager": "John Doe",
         },
         Metadata={
@@ -212,19 +245,29 @@ def portfolio_data(
 
 @pytest.fixture(scope="module")
 def zone_data(bootstrap_dynamo: bool, client_data: ClientFacts) -> ZoneFacts:
+    """
+    Create and save ZoneFacts test data.
 
+    :param bootstrap_dynamo: Bootstrap completion status
+    :type bootstrap_dynamo: bool
+    :param client_data: ClientFacts instance
+    :type client_data: ClientFacts
+    :returns: Created ZoneFacts instance
+    :rtype: ZoneFacts
+    """
     assert bootstrap_dynamo
     assert isinstance(client_data, ClientFacts)
 
+    # PynamoDB: PascalCase attribute access
     automation_account_id = client_data.AutomationAccount
     automation_account_name = client_data.OrganizationName
 
     zone_label = "my-automation-service-zone"
 
     zone = ZoneFacts(
-        Client=client_data.Client,
+        Client=client_data.Client,  # PynamoDB: PascalCase attributes
         Zone=zone_label,
-        AccountFacts=AccountFactsModel(
+        AccountFacts=AccountFactsModel(  # PynamoDB: PascalCase attributes
             Client=client_data.Client,
             AwsAccountId=automation_account_id,
             OrganizationalUnit="PrimaryUnit",
@@ -258,13 +301,11 @@ def zone_data(bootstrap_dynamo: bool, client_data: ClientFacts) -> ZoneFacts:
                 SecurityAliases={
                     "global_cidrs": [
                         SecurityAliasFacts(
-                            Type="cidr",
+                            Type="cidr",  # PynamoDB: PascalCase attributes
                             Value="192.168.0.0/16",
                             Description="Global CIDR 1",
                         ),
-                        SecurityAliasFacts(
-                            Type="cidr", Value="10.0.0.0/8", Description="Global CIDR 2"
-                        ),
+                        SecurityAliasFacts(Type="cidr", Value="10.0.0.0/8", Description="Global CIDR 2"),
                     ]
                 },
                 SecurityGroupAliases={
@@ -273,13 +314,13 @@ def zone_data(bootstrap_dynamo: bool, client_data: ClientFacts) -> ZoneFacts:
                 },
                 Proxy=[
                     ProxyFacts(
-                        Host="myprox.proxy.com",
+                        Host="myproxy.proxy.com",
                         Port=8080,
                         Url="http://proxy.acme.com:8080",
-                        NoProxy="10.0.0.0/8,192.168.0.0/16,*acme.com",
+                        NoProxy="10.0.0.0/8,192.168.0.0/16,*.acme.com",
                     )
                 ],
-                ProxyHost="myprox.proxy.com",
+                ProxyHost="myproxy.proxy.com",
                 ProxyPort=8080,
                 ProxyUrl="http://proxy.acme.com:8080",
                 NoProxy="127.0.0.1,localhost,*.acme.com",
@@ -301,22 +342,35 @@ def app_data(
     zone_data: ZoneFacts,
     arguments: dict,
 ) -> AppFacts:
+    """
+    Create and save AppFacts test data.
 
+    :param bootstrap_dynamo: Bootstrap completion status
+    :type bootstrap_dynamo: bool
+    :param portfolio_data: PortfolioFacts instance
+    :type portfolio_data: PortfolioFacts
+    :param zone_data: ZoneFacts instance
+    :type zone_data: ZoneFacts
+    :param arguments: Test arguments
+    :type arguments: dict
+    :returns: Created AppFacts instance
+    :rtype: AppFacts
+    """
     assert bootstrap_dynamo
     assert isinstance(portfolio_data, PortfolioFacts)
     assert isinstance(zone_data, ZoneFacts)
     assert isinstance(arguments, dict)
 
     portfolio = arguments["portfolio"]
-    app = arguments["app"]
+    app_name = arguments["app"]
 
     # The client/portfolio is where this BizApp that this Deployment is for.
     # The Zone is where this BizApp component will be deployed.
 
-    app = AppFacts(
-        ClientPortfolio=portfolio_data.get_client_portfolio_key(),
-        AppRegex=f"^prn:{portfolio}:{app}:.*:.*$",
-        Zone=zone_data.Zone,
+    app_facts = AppFacts(
+        ClientPortfolio=portfolio_data.get_client_portfolio_key(),  # PynamoDB: PascalCase attributes
+        AppRegex=f"^prn:{portfolio}:{app_name}:.*:.*$",
+        Zone=zone_data.Zone,  # PynamoDB: PascalCase attribute access
         Name="test application",
         Environment="prod",
         ImageAliases={"image1": "awsImageID1234234234"},
@@ -326,20 +380,29 @@ def app_data(
         Metadata={"misc": "items"},
     )
 
-    app.save()
+    app_facts.save()
 
-    return app
+    return app_facts
 
 
 @pytest.fixture(scope="module")
 def task_payload(arguments: dict) -> TaskPayload:
+    """
+    Create TaskPayload for testing.
 
+    :param arguments: Test arguments
+    :type arguments: dict
+    :returns: Created TaskPayload instance
+    :rtype: TaskPayload
+    """
     task_payload = TaskPayload.from_arguments(**arguments)
 
-    pkg = task_payload.Package
+    # TaskPayload is Pydantic: snake_case attributes
+    pkg = task_payload.package
 
     # UPLOAD action to upload our package to the system
-    zipfilename = os.path.join(pkg.DataPath, pkg.BucketName, pkg.Key)
+    # PackageDetails is Pydantic: snake_case attributes
+    zipfilename = os.path.join(pkg.data_path, pkg.bucket_name, pkg.key)
     os.makedirs(os.path.dirname(zipfilename), exist_ok=True)
 
     if os.path.exists(zipfilename):
@@ -361,7 +424,24 @@ def facts_data(
     zone_data: ZoneFacts,
     app_data: AppFacts,
 ):
+    """
+    Get facts data for testing.
 
+    :param bootstrap_dynamo: Bootstrap completion status
+    :type bootstrap_dynamo: bool
+    :param task_payload: TaskPayload instance
+    :type task_payload: TaskPayload
+    :param client_data: ClientFacts instance
+    :type client_data: ClientFacts
+    :param portfolio_data: PortfolioFacts instance
+    :type portfolio_data: PortfolioFacts
+    :param zone_data: ZoneFacts instance
+    :type zone_data: ZoneFacts
+    :param app_data: AppFacts instance
+    :type app_data: AppFacts
+    :returns: Facts dictionary
+    :rtype: dict
+    """
     assert bootstrap_dynamo
     assert isinstance(task_payload, TaskPayload)
     assert isinstance(client_data, ClientFacts)
@@ -369,12 +449,14 @@ def facts_data(
     assert isinstance(zone_data, ZoneFacts)
     assert isinstance(app_data, AppFacts)
 
-    deployment_details = task_payload.DeploymentDetails
+    # TaskPayload is Pydantic: snake_case attribute
+    deployment_details = task_payload.deployment_details
 
     facts = get_facts(deployment_details)
 
     assert facts is not None
 
+    # Facts dict has PascalCase keys, PynamoDB models have PascalCase attributes
     assert facts["Client"] == client_data.Client
     assert facts["Portfolio"] == portfolio_data.Portfolio
     assert facts["Name"] == app_data.Name
@@ -385,15 +467,13 @@ def facts_data(
 
 
 def test_run_ds_compile(task_payload: TaskPayload, facts_data: dict):
-
+    """Test deployspec compile task."""
     assert facts_data is not None
 
-    task_payload.Task = TASK_COMPILE
-    task_payload.Type = V_DEPLOYSPEC
+    task_payload.task = TASK_COMPILE
+    task_payload.type = V_DEPLOYSPEC
 
     response = invoker(task_payload.model_dump(), None)
-
-    assert response is not None
 
     assert response is not None
     assert "Error" in response
@@ -401,11 +481,11 @@ def test_run_ds_compile(task_payload: TaskPayload, facts_data: dict):
 
 
 def test_run_ds_plan(task_payload: TaskPayload, facts_data: dict):
-
+    """Test deployspec plan task."""
     assert facts_data is not None
 
-    task_payload.Task = TASK_PLAN
-    task_payload.Type = V_DEPLOYSPEC
+    task_payload.task = TASK_PLAN
+    task_payload.type = V_DEPLOYSPEC
 
     response = invoker(task_payload.model_dump(), None)
 
@@ -415,11 +495,11 @@ def test_run_ds_plan(task_payload: TaskPayload, facts_data: dict):
 
 
 def test_run_ds_apply(task_payload: TaskPayload, facts_data: dict):
-
+    """Test deployspec apply task."""
     assert facts_data is not None
 
-    task_payload.Task = TASK_APPLY
-    task_payload.Type = V_DEPLOYSPEC
+    task_payload.task = TASK_APPLY
+    task_payload.type = V_DEPLOYSPEC
 
     response = invoker(task_payload.model_dump(), None)
 
@@ -429,9 +509,9 @@ def test_run_ds_apply(task_payload: TaskPayload, facts_data: dict):
 
 
 def test_run_ds_deploy(task_payload: TaskPayload):
-
-    task_payload.Task = TASK_DEPLOY
-    task_payload.Type = V_DEPLOYSPEC
+    """Test deployspec deploy task."""
+    task_payload.task = TASK_DEPLOY
+    task_payload.type = V_DEPLOYSPEC
 
     response = invoker(task_payload.model_dump(), None)
 
@@ -441,9 +521,9 @@ def test_run_ds_deploy(task_payload: TaskPayload):
 
 
 def test_run_ds_teardown(task_payload: TaskPayload):
-
-    task_payload.Task = TASK_TEARDOWN
-    task_payload.Type = V_DEPLOYSPEC
+    """Test deployspec teardown task."""
+    task_payload.task = TASK_TEARDOWN
+    task_payload.type = V_DEPLOYSPEC
 
     response = invoker(task_payload.model_dump(), None)
 
@@ -453,11 +533,11 @@ def test_run_ds_teardown(task_payload: TaskPayload):
 
 
 def test_run_pl_compile(task_payload: TaskPayload, facts_data: dict):
-
+    """Test pipeline compile task."""
     assert facts_data is not None
 
-    task_payload.Task = TASK_COMPILE
-    task_payload.Type = V_PIPELINE
+    task_payload.task = TASK_COMPILE
+    task_payload.type = V_PIPELINE
 
     response = invoker(task_payload.model_dump(), None)
 
@@ -467,9 +547,9 @@ def test_run_pl_compile(task_payload: TaskPayload, facts_data: dict):
 
 
 def test_run_pl_deploy(task_payload: TaskPayload):
-
-    task_payload.Task = TASK_DEPLOY
-    task_payload.Type = V_PIPELINE
+    """Test pipeline deploy task."""
+    task_payload.task = TASK_DEPLOY
+    task_payload.type = V_PIPELINE
 
     response = invoker(task_payload.model_dump(), None)
 
@@ -479,9 +559,9 @@ def test_run_pl_deploy(task_payload: TaskPayload):
 
 
 def test_run_pl_release(task_payload: TaskPayload):
-
-    task_payload.Task = TASK_RELEASE
-    task_payload.Type = V_PIPELINE
+    """Test pipeline release task."""
+    task_payload.task = TASK_RELEASE
+    task_payload.type = V_PIPELINE
 
     response = invoker(task_payload.model_dump(), None)
 
@@ -491,9 +571,9 @@ def test_run_pl_release(task_payload: TaskPayload):
 
 
 def test_run_pl_teardown(task_payload: TaskPayload):
-
-    task_payload.Task = TASK_TEARDOWN
-    task_payload.Type = V_PIPELINE
+    """Test pipeline teardown task."""
+    task_payload.task = TASK_TEARDOWN
+    task_payload.type = V_PIPELINE
 
     response = invoker(task_payload.model_dump(), None)
 

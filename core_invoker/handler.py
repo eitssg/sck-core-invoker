@@ -24,115 +24,92 @@ from core_framework.models import TaskPayload
 
 def handler(event: dict, context: Any | None = None) -> dict:
     """
-    The invoker handler is the entry point for the invoker lambda function.  This function is responsible for
-    directing the incoming task to the appropriate execution engine.
+    Entry point for the invoker Lambda function.
 
-    This function returns a Task Response object { "Response": "..." } dictionary.
+    This function directs the incoming task to the appropriate execution engine
+    based on the task type. It returns a Task Response object as a dictionary.
 
-    Args:
-        event (dict): The "Lambda Event" from the requester.
-        context (dict): lambda context (Ex: cognito, SQS, SNS, etc). This is where you can get, for example,
-                        the lambda runtime lifetime, memory, etc. so you know how long the lambda can run.
-                        This is helpful if you have long-running actions and the lambda function will terminate.
-                        Better use step functions when running long-running actions.
+    :param event: The Lambda event, typically created with TaskPayload.model_dump().
+    :type event: dict
+    :param context: Lambda context object (optional).
+    :type context: Any, optional
 
-    Returns:
-        dict: The response from the invoker.  This is usually a dictionary with a "Response" key.
+    :returns: Dictionary with a "Response" key containing the result.
+    :rtype: dict
 
+    :raises ValueError: If the task type is unsupported.
     """
     try:
-        # event should have been created with TaskPayload.model_dump()
         task_payload = TaskPayload(**event)
-
-        # Setup logging
-        log.setup(task_payload.Identity)
-
+        log.setup(task_payload.identity)
         log.info(
             "Invoker started. Executing task: {}-{}",
-            task_payload.Task,
-            task_payload.Type,
+            task_payload.task,
+            task_payload.type,
         )
 
-        if task_payload.Type == V_PIPELINE:
-
+        if task_payload.type == V_PIPELINE:
             return handle_pipeline(task_payload)
 
-        if task_payload.Type == V_DEPLOYSPEC:
-
+        if task_payload.type == V_DEPLOYSPEC:
             return handle_deployspec(task_payload)
 
-        raise ValueError("Unsupported task type '{}'".format(task_payload.Type))
+        raise ValueError(f"Unsupported task type '{task_payload.type}'")
 
     except Exception as e:
         log.error("Error executing task: {}", e)
-        raise
+        return {"Response": {"Status": "error", "Message": str(e)}}
 
 
 def handle_deployspec(task_payload: TaskPayload) -> dict:
     """
-    Handle the deployment of a deploy spec.
+    Handles deployment actions for a deploy spec.
 
-    Args:
-        task_payload (TaskPayload): The task payload object.
+    :param task_payload: The task payload object.
+    :type task_payload: TaskPayload
 
-    Returns:
-        dict: The response from the invoker.  This is usually a dictionary with a "Response" key.
+    :returns: Dictionary with a "Response" key containing the result.
+    :rtype: dict
 
+    :raises ValueError: If the task is unsupported.
     """
-    if task_payload.Task == TASK_COMPILE:
-
+    if task_payload.task == TASK_COMPILE:
         # Compile the package
         compiler_response = execute_deployspec_compiler(task_payload)
-
-        # MUST return a dictionary { "Response": "..." }
         return compiler_response
 
-    if task_payload.Task == TASK_PLAN:
+    if task_payload.task == TASK_PLAN:
+        return {"Response": {"Error": "Not implemented"}}
 
-        compiler_response = {"Error": "Not implemented"}
+    if task_payload.task == TASK_APPLY:
+        return {"Response": {"Error": "Not implemented"}}
 
-        # MUST return a dictionary { "Response": "..." }
-        return compiler_response
-
-    if task_payload.Task == TASK_APPLY:
-
-        compiler_response = {"Error": "Not implemented"}
-
-        # MUST return a dictionary { "Response": "..." }
-        return compiler_response
-
-    if task_payload.Task in [TASK_DEPLOY, TASK_TEARDOWN]:
-
-        # MUST return a dictionary { "Response": "..." }
+    if task_payload.task in [TASK_DEPLOY, TASK_TEARDOWN]:
         return execute_runner(task_payload)
 
-    raise ValueError("Unsupported task '{}'".format(task_payload.Task))
+    raise ValueError(f"Unsupported task '{task_payload.task}'")
 
 
 def handle_pipeline(task_payload: TaskPayload) -> dict:
     """
-    Handle the deployment of a pipeline.
+    Handles deployment actions for a pipeline.
 
-    Args:
-        task_payload (TaskPayload): The task payload object.
+    :param task_payload: The task payload object.
+    :type task_payload: TaskPayload
 
-    Returns:
-        dict: The response from the invoker.  This is usually a dictionary with a "Response" key.
+    :returns: Dictionary with a "Response" key containing the result.
+    :rtype: dict
 
+    :raises ValueError: If the task is unsupported.
     """
-    if task_payload.Task == TASK_COMPILE:
+    if task_payload.task == TASK_COMPILE:
         # Copy package to artefacts bucket / key
         copy_to_artefacts(task_payload)
-
         # Compile the package
         compiler_response = execute_pipeline_compiler(task_payload)
-
-        # MUST return a dictionary { "Response": "..." }
         return compiler_response
 
-    if task_payload.Task in [TASK_DEPLOY, TASK_RELEASE, TASK_TEARDOWN]:
-
-        # MUST return a dictionary { "Response": "..." }
+    if task_payload.task in [TASK_DEPLOY, TASK_RELEASE, TASK_TEARDOWN]:
         return execute_runner(task_payload)
 
-    raise ValueError("Unsupported task '{}'".format(task_payload.Task))
+    raise ValueError(f"Unsupported task '{task_payload.task}'")
