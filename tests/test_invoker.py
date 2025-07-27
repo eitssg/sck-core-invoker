@@ -86,7 +86,9 @@ def bootstrap_dynamo() -> bool:
     # see environment variables in .env
     host = util.get_dynamodb_host()
 
-    assert host == "http://localhost:8000", "DYNAMODB_HOST must be set to http://localhost:8000"
+    assert (
+        host == "http://localhost:8000"
+    ), "DYNAMODB_HOST must be set to http://localhost:8000"
 
     try:
         if not EventModel.exists():
@@ -150,7 +152,9 @@ def organization() -> dict:
 
 
 @pytest.fixture(scope="module")
-def client_data(bootstrap_dynamo: bool, organization: dict, arguments: dict) -> ClientFacts:
+def client_data(
+    bootstrap_dynamo: bool, organization: dict, arguments: dict
+) -> ClientFacts:
     """
     Create and save ClientFacts test data.
 
@@ -198,7 +202,9 @@ def client_data(bootstrap_dynamo: bool, organization: dict, arguments: dict) -> 
 
 
 @pytest.fixture(scope="module")
-def portfolio_data(bootstrap_dynamo: bool, client_data: ClientFacts, arguments: dict) -> PortfolioFacts:
+def portfolio_data(
+    bootstrap_dynamo: bool, client_data: ClientFacts, arguments: dict
+) -> PortfolioFacts:
     """
     Create and save PortfolioFacts test data.
 
@@ -224,9 +230,20 @@ def portfolio_data(bootstrap_dynamo: bool, client_data: ClientFacts, arguments: 
         Client=client_data.Client,  # PynamoDB: PascalCase attributes
         Portfolio=portfolio_name,
         Contacts=[ContactFacts(Name="John Doe", Email="john.doe@example.com")],
-        Approvers=[ApproverFacts(Name="Jane Doe", Email="jane.doe@example.com", Roles=["admin"], Sequence=1)],
-        Project=ProjectFacts(Name="my-project", Description="my project description", Code="MYPRJ"),
-        Bizapp=ProjectFacts(Name="my-bizapp", Description="my bizapp description", Code="MYBIZ"),
+        Approvers=[
+            ApproverFacts(
+                Name="Jane Doe",
+                Email="jane.doe@example.com",
+                Roles=["admin"],
+                Sequence=1,
+            )
+        ],
+        Project=ProjectFacts(
+            Name="my-project", Description="my project description", Code="MYPRJ"
+        ),
+        Bizapp=ProjectFacts(
+            Name="my-bizapp", Description="my bizapp description", Code="MYBIZ"
+        ),
         Owner=OwnerFacts(Name="John Doe", Email="john.doe@example.com"),
         Domain=f"my-app.{domain_name}",
         Tags={
@@ -305,7 +322,9 @@ def zone_data(bootstrap_dynamo: bool, client_data: ClientFacts) -> ZoneFacts:
                             Value="192.168.0.0/16",
                             Description="Global CIDR 1",
                         ),
-                        SecurityAliasFacts(Type="cidr", Value="10.0.0.0/8", Description="Global CIDR 2"),
+                        SecurityAliasFacts(
+                            Type="cidr", Value="10.0.0.0/8", Description="Global CIDR 2"
+                        ),
                     ]
                 },
                 SecurityGroupAliases={
