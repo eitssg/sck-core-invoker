@@ -2206,14 +2206,14 @@ reference = "nexus"
 
 [[package]]
 name = "sck-core-component"
-version = "0.0.7"
+version = "0.0.8"
 description = "Core-Automation Component Compiler"
 optional = false
 python-versions = ">=3.12,<4.0"
 groups = ["main"]
 files = [
-    {file = "sck_core_component-0.0.7-py3-none-any.whl", hash = "sha256:dafb895905c42f59209cfe2d77cbeef6603e40b5e1efdc5947c8f2101a21aebb"},
-    {file = "sck_core_component-0.0.7.tar.gz", hash = "sha256:833d112e2bde2115228a01ce6631dbb3bc11f1dd30fb959cac9864b6975a9a3e"},
+    {file = "sck_core_component-0.0.8-py3-none-any.whl", hash = "sha256:ad71bc986a31c8560a52e7528ba270bdb8aa85ff76fac278307bc07984b12dbb"},
+    {file = "sck_core_component-0.0.8.tar.gz", hash = "sha256:ef6631c24d52c6cc3eccaec042a68af451294d906f6d6e8fd19b96abeb7eee4d"},
 ]
 
 [package.dependencies]
@@ -2224,8 +2224,8 @@ filters = ">=1.3.2,<2.0.0"
 jinja2 = ">=3.1.4,<4.0.0"
 jmespath = ">=1.0.1,<2.0.0"
 netaddr = ">=1.3.0,<2.0.0"
-sck-core-db = ">=0.0.7,<0.0.8"
-sck-core-framework = ">=0.0.7,<0.0.8"
+sck-core-db = ">=0.0.8,<0.0.9"
+sck-core-framework = ">=0.0.8,<0.0.9"
 
 [package.source]
 type = "legacy"
@@ -2234,14 +2234,14 @@ reference = "nexus"
 
 [[package]]
 name = "sck-core-db"
-version = "0.0.7"
+version = "0.0.8"
 description = "Core Database Library to access DynamoDB for Core-Automation"
 optional = false
 python-versions = ">=3.12,<4.0"
 groups = ["main"]
 files = [
-    {file = "sck_core_db-0.0.7-py3-none-any.whl", hash = "sha256:c7157df391cb560d96ca582fa0090a393981e5a3280e9eaa26bc6f01b4920683"},
-    {file = "sck_core_db-0.0.7.tar.gz", hash = "sha256:360b2bfa76051b5b2a50201b71c56b5c8e03b42a2a624a8ae11ccc20579eb606"},
+    {file = "sck_core_db-0.0.8-py3-none-any.whl", hash = "sha256:695a7d61e809b5a8c60c352a3c852590dac00ca3cab2d051018a44a2ba650889"},
+    {file = "sck_core_db-0.0.8.tar.gz", hash = "sha256:92e1b3c1193ad43e35aa29a9e2e275bc2ec3b0af3be50a4f4d459eeb2aff7fc4"},
 ]
 
 [package.dependencies]
@@ -2249,7 +2249,7 @@ boto3 = ">=1.39.9"
 botocore = ">=1.39.9"
 pydantic = ">=2.10.3,<3.0.0"
 pynamodb = ">=6.0.1,<7.0.0"
-sck-core-framework = ">=0.0.7,<0.0.8"
+sck-core-framework = ">=0.0.8,<0.0.9"
 
 [package.source]
 type = "legacy"
@@ -2258,22 +2258,21 @@ reference = "nexus"
 
 [[package]]
 name = "sck-core-deployspec"
-version = "0.0.7"
+version = "0.0.8"
 description = "Core Automation Deployspec Actions Compiler lambda function"
 optional = false
 python-versions = ">=3.12,<4.0"
 groups = ["main"]
 files = [
-    {file = "sck_core_deployspec-0.0.7-py3-none-any.whl", hash = "sha256:f2c2021abcaf5c1811db4ce279f53f8ce4f0c3f820ed78170689de664b6109cc"},
-    {file = "sck_core_deployspec-0.0.7.tar.gz", hash = "sha256:6163c2c0905e089c4a3f271a7b8859149245b7feb872fd49316519ad1cf0cae2"},
+    {file = "sck_core_deployspec-0.0.8-py3-none-any.whl", hash = "sha256:6713066c9e725aa5ba6d0a00f63b12a58e0e69369d9205ab94460b716373ff92"},
+    {file = "sck_core_deployspec-0.0.8.tar.gz", hash = "sha256:90c0cd185dd2735f48d00637b1f7479f98d205d7c145b23dc0229b9e946684cd"},
 ]
 
 [package.dependencies]
 boto3 = ">=1.39.9"
 botocore = ">=1.39.9"
-sck-core-db = ">=0.0.7,<0.0.8"
-sck-core-execute = {path = "D:/Development/simple-cloud-kit-oss/simple-cloud-kit/sck-core-execute"}
-sck-core-framework = ">=0.0.7,<0.0.8"
+sck-core-db = ">=0.0.8,<0.0.9"
+sck-core-framework = ">=0.0.8,<0.0.9"
 
 [package.source]
 type = "legacy"
@@ -2282,22 +2281,22 @@ reference = "nexus"
 
 [[package]]
 name = "sck-core-execute"
-version = "0.0.7"
+version = "0.0.8"
 description = "Core Automation Engine execute Lambda function"
 optional = false
 python-versions = ">=3.12,<4.0"
 groups = ["main"]
 files = [
-    {file = "sck_core_execute-0.0.7-py3-none-any.whl", hash = "sha256:0df6f1045e74374b61c8d0f7355c4c30c9dff27365314f8e95c376956afa8497"},
-    {file = "sck_core_execute-0.0.7.tar.gz", hash = "sha256:d5c30eb8e5492fa03de44efe5cb8601ffdc9e4518fac81b318fe2b6de44452cc"},
+    {file = "sck_core_execute-0.0.8-py3-none-any.whl", hash = "sha256:bd5608e48bea6dd4eb6d56b51006d6a8d2bb9142c4af3385b65b06824015b308"},
+    {file = "sck_core_execute-0.0.8.tar.gz", hash = "sha256:e755308d74d5bda87d0486a45f5ce522a976651ebe91d48b874134c15228da5c"},
 ]
 
 [package.dependencies]
 boto3 = ">=1.39.9"
 botocore = ">=1.39.9"
 inflect = ">=7.5.0,<8.0.0"
-sck-core-db = ">=0.0.7,<0.0.8"
-sck-core-framework = ">=0.0.7,<0.0.8"
+sck-core-db = ">=0.0.8,<0.0.9"
+sck-core-framework = ">=0.0.8,<0.0.9"
 
 [package.source]
 type = "legacy"
@@ -2306,14 +2305,14 @@ reference = "nexus"
 
 [[package]]
 name = "sck-core-framework"
-version = "0.0.7"
+version = "0.0.8"
 description = "Core-Framework for Core-Automation"
 optional = false
 python-versions = ">=3.12,<4.0"
 groups = ["main"]
 files = [
-    {file = "sck_core_framework-0.0.7-py3-none-any.whl", hash = "sha256:2a9e3b38196ef1c34bb8fa665335dba1b78c71ec92120c253fc748cbbfc77071"},
-    {file = "sck_core_framework-0.0.7.tar.gz", hash = "sha256:33f2797e22aa7dd1e59a3f243b427b3f209d13762bb0f26b5f70ffe2924ef670"},
+    {file = "sck_core_framework-0.0.8-py3-none-any.whl", hash = "sha256:faa4ec5731feb3a6d3a5b35c47024ddd88aef79609f2d735ee4f34b521d4fd21"},
+    {file = "sck_core_framework-0.0.8.tar.gz", hash = "sha256:0cbc8eb53e9e7b1f8e760822931845d4bdce0abf8e655fd895b5aee7ac1d996e"},
 ]
 
 [package.dependencies]
@@ -2334,20 +2333,20 @@ reference = "nexus"
 
 [[package]]
 name = "sck-core-report"
-version = "0.0.7"
+version = "0.0.8"
 description = "Tool to inspect flow control of stepfunction"
 optional = false
 python-versions = ">=3.12,<4.0"
 groups = ["main"]
 files = [
-    {file = "sck_core_report-0.0.7-py3-none-any.whl", hash = "sha256:3a61ef5ab983f23db9e29bdc6ee9a094ceaf0aaedec518ccf18ec5ec949af814"},
-    {file = "sck_core_report-0.0.7.tar.gz", hash = "sha256:6964f00acbed466712d38bc878be0df0091fbd1ae63a270ace95ae082f73474d"},
+    {file = "sck_core_report-0.0.8-py3-none-any.whl", hash = "sha256:b1f7d5b7a81fd4fc097bece520c81bf95ad4ac2ad8a05353b24345c3d100d129"},
+    {file = "sck_core_report-0.0.8.tar.gz", hash = "sha256:4bf25c6c505e1ce7844717d3cfaa9f85a295dc469d8b876bd07d3b0f99a35d16"},
 ]
 
 [package.dependencies]
 boto3 = ">=1.39.9"
 botocore = ">=1.39.9"
-sck-core-framework = ">=0.0.7,<0.0.8"
+sck-core-framework = ">=0.0.8,<0.0.9"
 
 [package.source]
 type = "legacy"
@@ -2356,23 +2355,23 @@ reference = "nexus"
 
 [[package]]
 name = "sck-core-runner"
-version = "0.0.7"
+version = "0.0.8"
 description = "Core Automation Runner Lambda function"
 optional = false
 python-versions = ">=3.12,<4.0"
 groups = ["main"]
 files = [
-    {file = "sck_core_runner-0.0.7-py3-none-any.whl", hash = "sha256:c9d553e3a68438d07b7b39de224a276f6ff7dbf628bf485b1389e9e5d20c3b23"},
-    {file = "sck_core_runner-0.0.7.tar.gz", hash = "sha256:03d5863566cf2846de9f1437948ff1541ab81404477e32d2dbcc74a4b196e457"},
+    {file = "sck_core_runner-0.0.8-py3-none-any.whl", hash = "sha256:d1bfd73a4bbdebeb34c46ffb7d3a23d1ebe1549b41d4bdcddc926d1adad54dd1"},
+    {file = "sck_core_runner-0.0.8.tar.gz", hash = "sha256:bdad3cbee0be46c832d322b8f7a1975326f1a8320305f37889204566dfc336d5"},
 ]
 
 [package.dependencies]
 boto3 = ">=1.39.9"
 botocore = ">=1.39.9"
-sck-core-db = ">=0.0.7,<0.0.8"
-sck-core-execute = ">=0.0.7,<0.0.8"
-sck-core-framework = ">=0.0.7,<0.0.8"
-sck-core-report = ">=0.0.7,<0.0.8"
+sck-core-db = ">=0.0.8,<0.0.9"
+sck-core-execute = ">=0.0.8,<0.0.9"
+sck-core-framework = ">=0.0.8,<0.0.9"
+sck-core-report = ">=0.0.8,<0.0.9"
 
 [package.source]
 type = "legacy"
@@ -2553,4 +2552,4 @@ reference = "nexus"
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.12"
-content-hash = "a4c1290764737a0ee813d7e3b5724750610c629a8006506e2c0ca1ca00b72213"
+content-hash = "f76259e4361758b2fc01416d6dc109226c729494685a5d817660dc96550647f8"
