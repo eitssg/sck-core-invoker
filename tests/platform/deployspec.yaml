@@ -1,0 +1,14 @@
+- apiVersion: v1
+  kind: create-stack
+  metadata:
+    description: Sample deployment for testing purposes
+    namespace: sample_namespace
+  name: sample-deployment
+  params:
+    account: "{{ AccountName }}"
+    region: "{{ Region }}"
+    stack_name: sample-stack
+    template: template.yaml
+    stack_parameters:
+      Client: "{{ Client }}"
+      Zone: "{{ Zone }}"
