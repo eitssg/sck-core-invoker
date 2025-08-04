@@ -151,7 +151,7 @@ def test_run_ds_compile(task_payload: TaskPayload, facts_data: dict):
 
     upload_package(task_payload.package)
 
-    task_payload.task = TASK_COMPILE
+    task_payload.set_task(TASK_COMPILE)
     task_payload.type = V_DEPLOYSPEC
 
     response = invoker(task_payload.model_dump(), None)
@@ -166,7 +166,7 @@ def test_run_ds_plan(task_payload: TaskPayload, facts_data: dict):
     """Test deployspec plan task."""
     assert facts_data is not None
 
-    task_payload.task = TASK_PLAN
+    task_payload.set_task(TASK_PLAN)
     task_payload.type = V_DEPLOYSPEC
 
     response = invoker(task_payload.model_dump(), None)
@@ -180,7 +180,7 @@ def test_run_ds_apply(task_payload: TaskPayload, facts_data: dict):
     """Test deployspec apply task."""
     assert facts_data is not None
 
-    task_payload.task = TASK_APPLY
+    task_payload.set_task(TASK_APPLY)
     task_payload.type = V_DEPLOYSPEC
 
     response = invoker(task_payload.model_dump(), None)
@@ -193,7 +193,7 @@ def test_run_ds_apply(task_payload: TaskPayload, facts_data: dict):
 def test_run_ds_deploy(task_payload: TaskPayload):
     """Test deployspec deploy task."""
 
-    task_payload.task = TASK_DEPLOY
+    task_payload.set_task(TASK_DEPLOY)
     task_payload.type = V_DEPLOYSPEC
 
     response = invoker(task_payload.model_dump(), None)
@@ -206,7 +206,7 @@ def test_run_ds_deploy(task_payload: TaskPayload):
 
 def test_run_ds_teardown(task_payload: TaskPayload):
     """Test deployspec teardown task."""
-    task_payload.task = TASK_TEARDOWN
+    task_payload.set_task(TASK_TEARDOWN)
     task_payload.type = V_DEPLOYSPEC
 
     response = invoker(task_payload.model_dump(), None)
@@ -220,7 +220,7 @@ def test_run_pl_compile(task_payload: TaskPayload, facts_data: dict):
     """Test pipeline compile task."""
     assert facts_data is not None
 
-    task_payload.task = TASK_COMPILE
+    task_payload.set_task(TASK_COMPILE)
     task_payload.type = V_PIPELINE
 
     response = invoker(task_payload.model_dump(), None)
@@ -232,7 +232,7 @@ def test_run_pl_compile(task_payload: TaskPayload, facts_data: dict):
 
 def test_run_pl_deploy(task_payload: TaskPayload):
     """Test pipeline deploy task."""
-    task_payload.task = TASK_DEPLOY
+    task_payload.set_task(TASK_DEPLOY)
     task_payload.type = V_PIPELINE
 
     response = invoker(task_payload.model_dump(), None)
@@ -244,7 +244,7 @@ def test_run_pl_deploy(task_payload: TaskPayload):
 
 def test_run_pl_release(task_payload: TaskPayload):
     """Test pipeline release task."""
-    task_payload.task = TASK_RELEASE
+    task_payload.set_task(TASK_RELEASE)
     task_payload.type = V_PIPELINE
 
     response = invoker(task_payload.model_dump(), None)
@@ -256,7 +256,7 @@ def test_run_pl_release(task_payload: TaskPayload):
 
 def test_run_pl_teardown(task_payload: TaskPayload):
     """Test pipeline teardown task."""
-    task_payload.task = TASK_TEARDOWN
+    task_payload.set_task(TASK_TEARDOWN)
     task_payload.type = V_PIPELINE
 
     response = invoker(task_payload.model_dump(), None)

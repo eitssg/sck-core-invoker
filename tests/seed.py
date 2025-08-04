@@ -3,16 +3,33 @@ import pytest
 import core_framework as util
 
 from core_db.registry.client import ClientFacts, ClientFactsFactory
-from core_db.registry.portfolio import PortfolioFacts, PortfolioFactsFactory, ContactFacts, ApproverFacts, ProjectFacts, OwnerFacts
+from core_db.registry.portfolio import (
+    PortfolioFacts,
+    PortfolioFactsFactory,
+    ContactFacts,
+    ApproverFacts,
+    ProjectFacts,
+    OwnerFacts,
+)
 from core_db.registry.app import AppFacts, AppFactsFactory
-from core_db.registry.zone import ZoneFacts, ZoneFactsFactory, AccountFacts, RegionFacts, KmsFacts, SecurityAliasFacts, ProxyFacts
+from core_db.registry.zone import (
+    ZoneFacts,
+    ZoneFactsFactory,
+    AccountFacts,
+    RegionFacts,
+    KmsFacts,
+    SecurityAliasFacts,
+    ProxyFacts,
+)
 
 from .bootstrap import *
 from .arguments import *
 
 
 @pytest.fixture(scope="module")
-def client_data(bootstrap_dynamo: bool, organization: dict, arguments: dict) -> ClientFacts:
+def client_data(
+    bootstrap_dynamo: bool, organization: dict, arguments: dict
+) -> ClientFacts:
     """
     Create and save ClientFacts test data.
 
@@ -61,7 +78,9 @@ def client_data(bootstrap_dynamo: bool, organization: dict, arguments: dict) -> 
 
 
 @pytest.fixture(scope="module")
-def portfolio_data(bootstrap_dynamo: bool, client_data: ClientFacts, arguments: dict) -> PortfolioFacts:
+def portfolio_data(
+    bootstrap_dynamo: bool, client_data: ClientFacts, arguments: dict
+) -> PortfolioFacts:
     """
     Create and save PortfolioFacts test data.
 
@@ -97,8 +116,12 @@ def portfolio_data(bootstrap_dynamo: bool, client_data: ClientFacts, arguments: 
                 Sequence=1,
             )
         ],
-        Project=ProjectFacts(Name="my-project", Description="my project description", Code="MYPRJ"),
-        Bizapp=ProjectFacts(Name="my-bizapp", Description="my bizapp description", Code="MYBIZ"),
+        Project=ProjectFacts(
+            Name="my-project", Description="my project description", Code="MYPRJ"
+        ),
+        Bizapp=ProjectFacts(
+            Name="my-bizapp", Description="my bizapp description", Code="MYBIZ"
+        ),
         Owner=OwnerFacts(Name="John Doe", Email="john.doe@example.com"),
         Domain=f"my-app.{domain_name}",
         Tags={
@@ -180,7 +203,9 @@ def zone_data(bootstrap_dynamo: bool, client_data: ClientFacts) -> ZoneFacts:
                             Value="192.168.0.0/16",
                             Description="Global CIDR 1",
                         ),
-                        SecurityAliasFacts(Type="cidr", Value="10.0.0.0/8", Description="Global CIDR 2"),
+                        SecurityAliasFacts(
+                            Type="cidr", Value="10.0.0.0/8", Description="Global CIDR 2"
+                        ),
                     ]
                 },
                 SecurityGroupAliases={
