@@ -35,11 +35,7 @@ def execute_pipeline_compiler(task_payload: TaskPayload) -> dict:
         response = aws.invoke_lambda(arn, task_payload.model_dump())
 
     if TR_RESPONSE not in response:
-        raise RuntimeError(
-            "Pipeline compiler response does not contain a response: {}".format(
-                response
-            )
-        )
+        raise RuntimeError("Pipeline compiler response does not contain a response: {}".format(response))
 
     return response[TR_RESPONSE]
 
@@ -64,11 +60,7 @@ def execute_deployspec_compiler(task_payload: TaskPayload) -> dict:
         response = aws.invoke_lambda(arn, task_payload.model_dump())
 
     if TR_RESPONSE not in response:
-        raise RuntimeError(
-            "Deployspec compiler response does not contain a response: {}".format(
-                response
-            )
-        )
+        raise RuntimeError("Deployspec compiler response does not contain a response: {}".format(response))
 
     return response[TR_RESPONSE]
 
@@ -98,9 +90,7 @@ def execute_runner(task_payload: TaskPayload) -> dict:
         response = aws.invoke_lambda(arn, task_payload.model_dump())
 
     if TR_RESPONSE not in response:
-        raise RuntimeError(
-            "Runner response does not contain a response: {}".format(response)
-        )
+        raise RuntimeError("Runner response does not contain a response: {}".format(response))
 
     return response
 
@@ -135,9 +125,7 @@ def copy_to_artefacts(task_payload: TaskPayload) -> dict:
     object_name = "package.zip"  # package.get_name()
 
     dd = task_payload.deployment_details
-    destination_key = dd.get_object_key(
-        OBJ_ARTEFACTS, object_name, s3=package.mode == V_SERVICE
-    )
+    destination_key = dd.get_object_key(OBJ_ARTEFACTS, object_name, s3=package.mode == V_SERVICE)
 
     copy_source = {"Bucket": package.bucket_name, "Key": package.key, "VersionId": None}
 
@@ -152,9 +140,7 @@ def copy_to_artefacts(task_payload: TaskPayload) -> dict:
         details=OrderedDict([("Source", copy_source), ("Destination", destination)]),
     )
 
-    artefact_bucket = MagicS3Client.get_bucket(
-        Region=artefact_bucket_region, BucketName=artefact_bucket_name
-    )
+    artefact_bucket = MagicS3Client.get_bucket(Region=artefact_bucket_region, BucketName=artefact_bucket_name)
 
     destination_object = artefact_bucket.Object(destination_key)
 
@@ -166,8 +152,6 @@ def copy_to_artefacts(task_payload: TaskPayload) -> dict:
     )
 
     if "Error" in response:
-        raise Exception(
-            "Error copying object to artefacts: {}".format(response["Error"])
-        )
+        raise Exception("Error copying object to artefacts: {}".format(response["Error"]))
 
     return response
