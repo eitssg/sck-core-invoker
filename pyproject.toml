@@ -4,7 +4,7 @@ build-backend = "poetry_dynamic_versioning.backend"
 
 [tool.poetry]
 name = "sck-core-invoker"
-version = "0.0.11-pre.2+fb4d062"
+version = "0.0.11-pre.4+a009e8c"
 description = "Core Automation Invoker Lambda function"
 authors = [ "James Barwick <jbarwick@me.com>",]
 license = "GPL-3.0-only"

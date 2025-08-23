@@ -27,7 +27,9 @@ from .arguments import *
 
 
 @pytest.fixture(scope="module")
-def client_data(bootstrap_dynamo: bool, organization: dict, arguments: dict) -> ClientFactsModel:
+def client_data(
+    bootstrap_dynamo: bool, organization: dict, arguments: dict
+) -> ClientFactsModel:
     """
     Create and save ClientFactsModel test data.
 
@@ -76,7 +78,9 @@ def client_data(bootstrap_dynamo: bool, organization: dict, arguments: dict) -> 
 
 
 @pytest.fixture(scope="module")
-def portfolio_data(bootstrap_dynamo: bool, client_data: ClientFactsModel, arguments: dict) -> PortfolioFactsModel:
+def portfolio_data(
+    bootstrap_dynamo: bool, client_data: ClientFactsModel, arguments: dict
+) -> PortfolioFactsModel:
     """
     Create and save PortfolioFactsModel test data.
 
@@ -112,8 +116,12 @@ def portfolio_data(bootstrap_dynamo: bool, client_data: ClientFactsModel, argume
                 Sequence=1,
             )
         ],
-        Project=ProjectFacts(Name="my-project", Description="my project description", Code="MYPRJ"),
-        Bizapp=ProjectFacts(Name="my-bizapp", Description="my bizapp description", Code="MYBIZ"),
+        Project=ProjectFacts(
+            Name="my-project", Description="my project description", Code="MYPRJ"
+        ),
+        Bizapp=ProjectFacts(
+            Name="my-bizapp", Description="my bizapp description", Code="MYBIZ"
+        ),
         Owner=OwnerFacts(Name="John Doe", Email="john.doe@example.com"),
         Domain=f"my-app.{domain_name}",
         Tags={
@@ -195,7 +203,9 @@ def zone_data(bootstrap_dynamo: bool, client_data: ClientFactsModel) -> ZoneFact
                             Value="192.168.0.0/16",
                             Description="Global CIDR 1",
                         ),
-                        SecurityAliasFacts(Type="cidr", Value="10.0.0.0/8", Description="Global CIDR 2"),
+                        SecurityAliasFacts(
+                            Type="cidr", Value="10.0.0.0/8", Description="Global CIDR 2"
+                        ),
                     ]
                 },
                 SecurityGroupAliases={
