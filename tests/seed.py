@@ -2,18 +2,18 @@ import pytest
 
 import core_framework as util
 
-from core_db.registry.client import ClientFacts, ClientFactsFactory
+from core_db.registry.client import ClientFactsModel, ClientFactsFactory
 from core_db.registry.portfolio import (
-    PortfolioFacts,
+    PortfolioFactsModel,
     PortfolioFactsFactory,
     ContactFacts,
     ApproverFacts,
     ProjectFacts,
     OwnerFacts,
 )
-from core_db.registry.app import AppFacts, AppFactsFactory
+from core_db.registry.app import AppFactsModel, AppFactsFactory
 from core_db.registry.zone import (
-    ZoneFacts,
+    ZoneFactsModel,
     ZoneFactsFactory,
     AccountFacts,
     RegionFacts,
@@ -27,11 +27,9 @@ from .arguments import *
 
 
 @pytest.fixture(scope="module")
-def client_data(
-    bootstrap_dynamo: bool, organization: dict, arguments: dict
-) -> ClientFacts:
+def client_data(bootstrap_dynamo: bool, organization: dict, arguments: dict) -> ClientFactsModel:
     """
-    Create and save ClientFacts test data.
+    Create and save ClientFactsModel test data.
 
     :param bootstrap_dynamo: Bootstrap completion status
     :type bootstrap_dynamo: bool
@@ -39,8 +37,8 @@ def client_data(
     :type organization: dict
     :param arguments: Test arguments
     :type arguments: dict
-    :returns: Created ClientFacts instance
-    :rtype: ClientFacts
+    :returns: Created ClientFactsModel instance
+    :rtype: ClientFactsModel
     """
     assert bootstrap_dynamo
     assert isinstance(organization, dict)
@@ -78,23 +76,21 @@ def client_data(
 
 
 @pytest.fixture(scope="module")
-def portfolio_data(
-    bootstrap_dynamo: bool, client_data: ClientFacts, arguments: dict
-) -> PortfolioFacts:
+def portfolio_data(bootstrap_dynamo: bool, client_data: ClientFactsModel, arguments: dict) -> PortfolioFactsModel:
     """
-    Create and save PortfolioFacts test data.
+    Create and save PortfolioFactsModel test data.
 
     :param bootstrap_dynamo: Bootstrap completion status
     :type bootstrap_dynamo: bool
-    :param client_data: ClientFacts instance
-    :type client_data: ClientFacts
+    :param client_data: ClientFactsModel instance
+    :type client_data: ClientFactsModel
     :param arguments: Test arguments
     :type arguments: dict
-    :returns: Created PortfolioFacts instance
-    :rtype: PortfolioFacts
+    :returns: Created PortfolioFactsModel instance
+    :rtype: PortfolioFactsModel
     """
     assert bootstrap_dynamo
-    assert isinstance(client_data, ClientFacts)
+    assert isinstance(client_data, ClientFactsModel)
     assert isinstance(arguments, dict)
 
     portfolio_name = arguments["portfolio"]
@@ -116,12 +112,8 @@ def portfolio_data(
                 Sequence=1,
             )
         ],
-        Project=ProjectFacts(
-            Name="my-project", Description="my project description", Code="MYPRJ"
-        ),
-        Bizapp=ProjectFacts(
-            Name="my-bizapp", Description="my bizapp description", Code="MYBIZ"
-        ),
+        Project=ProjectFacts(Name="my-project", Description="my project description", Code="MYPRJ"),
+        Bizapp=ProjectFacts(Name="my-bizapp", Description="my bizapp description", Code="MYBIZ"),
         Owner=OwnerFacts(Name="John Doe", Email="john.doe@example.com"),
         Domain=f"my-app.{domain_name}",
         Tags={
@@ -139,19 +131,19 @@ def portfolio_data(
 
 
 @pytest.fixture(scope="module")
-def zone_data(bootstrap_dynamo: bool, client_data: ClientFacts) -> ZoneFacts:
+def zone_data(bootstrap_dynamo: bool, client_data: ClientFactsModel) -> ZoneFactsModel:
     """
-    Create and save ZoneFacts test data.
+    Create and save ZoneFactsModel test data.
 
     :param bootstrap_dynamo: Bootstrap completion status
     :type bootstrap_dynamo: bool
-    :param client_data: ClientFacts instance
-    :type client_data: ClientFacts
-    :returns: Created ZoneFacts instance
-    :rtype: ZoneFacts
+    :param client_data: ClientFactsModel instance
+    :type client_data: ClientFactsModel
+    :returns: Created ZoneFactsModel instance
+    :rtype: ZoneFactsModel
     """
     assert bootstrap_dynamo
-    assert isinstance(client_data, ClientFacts)
+    assert isinstance(client_data, ClientFactsModel)
 
     # PynamoDB: PascalCase attribute access
     automation_account_id = client_data.AutomationAccount
@@ -203,9 +195,7 @@ def zone_data(bootstrap_dynamo: bool, client_data: ClientFacts) -> ZoneFacts:
                             Value="192.168.0.0/16",
                             Description="Global CIDR 1",
                         ),
-                        SecurityAliasFacts(
-                            Type="cidr", Value="10.0.0.0/8", Description="Global CIDR 2"
-                        ),
+                        SecurityAliasFacts(Type="cidr", Value="10.0.0.0/8", Description="Global CIDR 2"),
                     ]
                 },
                 SecurityGroupAliases={
@@ -238,28 +228,28 @@ def zone_data(bootstrap_dynamo: bool, client_data: ClientFacts) -> ZoneFacts:
 @pytest.fixture(scope="module")
 def app_data(
     bootstrap_dynamo: bool,
-    portfolio_data: PortfolioFacts,
-    zone_data: ZoneFacts,
-    client_data: ClientFacts,
+    portfolio_data: PortfolioFactsModel,
+    zone_data: ZoneFactsModel,
+    client_data: ClientFactsModel,
     arguments: dict,
-) -> AppFacts:
+) -> AppFactsModel:
     """
-    Create and save AppFacts test data.
+    Create and save AppFactsModel test data.
 
     :param bootstrap_dynamo: Bootstrap completion status
     :type bootstrap_dynamo: bool
-    :param portfolio_data: PortfolioFacts instance
-    :type portfolio_data: PortfolioFacts
-    :param zone_data: ZoneFacts instance
-    :type zone_data: ZoneFacts
+    :param portfolio_data: PortfolioFactsModel instance
+    :type portfolio_data: PortfolioFactsModel
+    :param zone_data: ZoneFactsModel instance
+    :type zone_data: ZoneFactsModel
     :param arguments: Test arguments
     :type arguments: dict
-    :returns: Created AppFacts instance
-    :rtype: AppFacts
+    :returns: Created AppFactsModel instance
+    :rtype: AppFactsModel
     """
     assert bootstrap_dynamo
-    assert isinstance(portfolio_data, PortfolioFacts)
-    assert isinstance(zone_data, ZoneFacts)
+    assert isinstance(portfolio_data, PortfolioFactsModel)
+    assert isinstance(zone_data, ZoneFactsModel)
     assert isinstance(arguments, dict)
 
     client = client_data.Client

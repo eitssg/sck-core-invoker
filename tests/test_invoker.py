@@ -13,10 +13,10 @@ import core_helper.aws as aws
 
 from core_framework.models import TaskPayload
 
-from core_db.registry.client import ClientFacts
-from core_db.registry.portfolio import PortfolioFacts
-from core_db.registry.app import AppFacts
-from core_db.registry.zone import ZoneFacts
+from core_db.registry.client import ClientFactsModel
+from core_db.registry.portfolio import PortfolioFactsModel
+from core_db.registry.app import AppFactsModel
+from core_db.registry.zone import ZoneFactsModel
 
 from core_db.facter import get_facts
 
@@ -98,10 +98,10 @@ def task_payload(arguments: dict) -> TaskPayload:
 def facts_data(
     bootstrap_dynamo: bool,
     task_payload: TaskPayload,
-    client_data: ClientFacts,
-    portfolio_data: PortfolioFacts,
-    zone_data: ZoneFacts,
-    app_data: AppFacts,
+    client_data: ClientFactsModel,
+    portfolio_data: PortfolioFactsModel,
+    zone_data: ZoneFactsModel,
+    app_data: AppFactsModel,
 ):
     """
     Get facts data for testing.
@@ -110,23 +110,23 @@ def facts_data(
     :type bootstrap_dynamo: bool
     :param task_payload: TaskPayload instance
     :type task_payload: TaskPayload
-    :param client_data: ClientFacts instance
-    :type client_data: ClientFacts
-    :param portfolio_data: PortfolioFacts instance
-    :type portfolio_data: PortfolioFacts
-    :param zone_data: ZoneFacts instance
-    :type zone_data: ZoneFacts
-    :param app_data: AppFacts instance
-    :type app_data: AppFacts
+    :param client_data: ClientFactsModel instance
+    :type client_data: ClientFactsModel
+    :param portfolio_data: PortfolioFactsModel instance
+    :type portfolio_data: PortfolioFactsModel
+    :param zone_data: ZoneFactsModel instance
+    :type zone_data: ZoneFactsModel
+    :param app_data: AppFactsModel instance
+    :type app_data: AppFactsModel
     :returns: Facts dictionary
     :rtype: dict
     """
     assert bootstrap_dynamo
     assert isinstance(task_payload, TaskPayload)
-    assert isinstance(client_data, ClientFacts)
-    assert isinstance(portfolio_data, PortfolioFacts)
-    assert isinstance(zone_data, ZoneFacts)
-    assert isinstance(app_data, AppFacts)
+    assert isinstance(client_data, ClientFactsModel)
+    assert isinstance(portfolio_data, PortfolioFactsModel)
+    assert isinstance(zone_data, ZoneFactsModel)
+    assert isinstance(app_data, AppFactsModel)
 
     # TaskPayload is Pydantic: snake_case attribute
     deployment_details = task_payload.deployment_details
