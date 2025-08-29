@@ -9,6 +9,6 @@
     region: "{{ Region }}"
     stack_name: sample-stack
     template: template.yaml
-    stack_parameters:
+    parameters:
       Client: "{{ Client }}"
       Zone: "{{ Zone }}"
