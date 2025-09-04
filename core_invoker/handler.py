@@ -41,18 +41,21 @@ def handler(event: dict, context: Any | None = None) -> dict:
     """
     try:
         task_payload = TaskPayload(**event)
+
+        log.set_correlation_id(task_payload.correlation_id)
+
         log.setup(task_payload.identity)
-        log.info(
+        log.debug(
             "Invoker started. Executing task: {}-{}",
             task_payload.task,
             task_payload.type,
         )
 
         if task_payload.type == V_PIPELINE:
-            return handle_pipeline(task_payload)
+            return _handle_pipeline(task_payload)
 
         if task_payload.type == V_DEPLOYSPEC:
-            return handle_deployspec(task_payload)
+            return _handle_deployspec(task_payload)
 
         raise ValueError(f"Unsupported task type '{task_payload.type}'")
 
@@ -61,7 +64,7 @@ def handler(event: dict, context: Any | None = None) -> dict:
         return {"Response": {"Status": "error", "Message": str(e)}}
 
 
-def handle_deployspec(task_payload: TaskPayload) -> dict:
+def _handle_deployspec(task_payload: TaskPayload) -> dict:
     """
     Handles deployment actions for a deploy spec.
 
@@ -90,7 +93,7 @@ def handle_deployspec(task_payload: TaskPayload) -> dict:
     raise ValueError(f"Unsupported task '{task_payload.task}'")
 
 
-def handle_pipeline(task_payload: TaskPayload) -> dict:
+def _handle_pipeline(task_payload: TaskPayload) -> dict:
     """
     Handles deployment actions for a pipeline.
 
