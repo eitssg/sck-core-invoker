@@ -4,7 +4,7 @@ build-backend = "poetry_dynamic_versioning.backend"
 
 [tool.poetry]
 name = "sck-core-invoker"
-version = "0.1.1"
+version = "0.1.2-pre.3+3f48488"
 description = "Core Automation Invoker Lambda function"
 authors = [ "James Barwick <jbarwick@me.com>",]
 license = "GPL-3.0-only"
@@ -66,3 +66,9 @@ cfn-lint = "^1.22.3"
 black = "^24.10.0"
 pytest-dotenv = "^0.5.2"
 pytest-cov = "^6.0.0"
+
+[tool.black]
+line-length = 132
+target-version = ["py313"]
+skip-string-normalization = true
+extend-exclude = ''' /(.venv|build|dist|htmlcov)/ '''
