@@ -78,9 +78,7 @@ def upload_package(package: PackageDetails):
             f"Uploading package to s3://{package.bucket_name}/{package.key}",
             details=package.model_dump(),
         )
-        bucket: MagicBucket = MagicS3Client.get_bucket(
-            Region=package.bucket_region, BucketName=package.bucket_name
-        )
+        bucket: MagicBucket = MagicS3Client.get_bucket(Region=package.bucket_region, BucketName=package.bucket_name)
 
         bucket.put_object(
             Body=open(temp_file_path, "rb"),
