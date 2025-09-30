@@ -40,7 +40,7 @@ def handler(event: dict, context: Any | None = None) -> dict:
     :raises ValueError: If the task type is unsupported.
     """
     try:
-        task_payload = TaskPayload(**event)
+        task_payload = TaskPayload.model_validate(event)
 
         log.set_correlation_id(task_payload.correlation_id)
 
