@@ -6,9 +6,7 @@ including setup of test data and validation of different task types.
 """
 
 import pytest
-import core_framework as util
 
-import core_logging as log
 import core_helper.aws as aws
 
 from core_framework.models import TaskPayload
@@ -33,11 +31,11 @@ from core_framework.constants import (
     V_DEPLOYSPEC,
 )
 
-from .conftest import *
-from .bootstrap import *
-from .seed import *
-from .arguments import *
-from .package import *
+from .conftest import *  # noqa: F403, F401
+from .bootstrap import *  # noqa: F403, F401
+from .seed import *  # noqa: F403, F401
+from .arguments import *  # noqa: F403, F401
+from .package import upload_package
 
 
 @pytest.fixture(scope="module")
@@ -136,11 +134,11 @@ def facts_data(
     assert facts is not None
 
     # Facts dict has PascalCase keys, PynamoDB models have PascalCase attributes
-    assert facts["Client"] == client_data.Client
-    assert facts["Portfolio"] == portfolio_data.Portfolio
-    assert facts["Name"] == app_data.Name
-    assert facts["Environment"] == app_data.Environment
-    assert facts["Zone"] == zone_data.Zone
+    assert facts["Client"] == client_data.client
+    assert facts["Portfolio"] == portfolio_data.portfolio
+    assert facts["Name"] == app_data.name
+    assert facts["Environment"] == app_data.environment
+    assert facts["Zone"] == zone_data.zone
 
     return facts
 
