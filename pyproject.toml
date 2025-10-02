@@ -57,8 +57,8 @@ exclude = '''
 [tool.uv.sources]
 sck-core-framework = { path = "../sck-core-framework", editable = true }
 sck-core-db = { path = "../sck-core-db", editable = true }
-sck-core-execute = { path = "../sck-core-execute", editable = true }
 sck-core-runner = { path = "../sck-core-runner", editable = true }
+sck-core-execute = { path = "../sck-core-execute", editable = true }
 sck-core-deployspec = { path = "../sck-core-deployspec", editable = true }
 sck-core-component = { path = "../sck-core-component", editable = true }
 
