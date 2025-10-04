@@ -1,5 +1,8 @@
 # Copilot Instructions (Submodule: sck-core-invoker)
 
+## Plan → Approval → Execute (Mandatory)
+Present plan → await approval → execute. Use root policy for definitions and exceptions.
+
 - Tech: Python package.
 - Precedence: Local first; root `../../.github/...` next.
 - Conventions: See `../sck-core-ui/docs/backend-code-style.md`.
