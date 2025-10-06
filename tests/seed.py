@@ -262,7 +262,7 @@ def app_data(
 
     apps = AppFactsFactory.get_model(client)
     app_facts = apps(
-        ClientPortfolio=portfolio_data.get_client_portfolio_key(),  # PynamoDB: PascalCase attributes
+        Portfolio=portfolio_data.portfolio,  # PynamoDB: PascalCase attributes
         AppRegex=f"^prn:{portfolio}:{app_name}:.*:.*$",
         Zone=zone_data.Zone,  # PynamoDB: PascalCase attribute access
         Name="test application",
