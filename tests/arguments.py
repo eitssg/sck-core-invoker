@@ -13,6 +13,7 @@ def arguments() -> dict:
     """
     return {
         "task": "compile",
+        "client_id": util.get_client_id(),
         "client": util.get_client(),
         "portfolio": "test-portfolio",
         "app": "test-app",

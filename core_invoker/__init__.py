@@ -1,5 +1,7 @@
 from .handler import handler as invoke
 
-__version__ = "0.1.2-pre.7+2ddf387"
+from importlib.metadata import version
+
+__version__ = version("sck-core-invoker")
 
 __all__ = ["invoke"]
